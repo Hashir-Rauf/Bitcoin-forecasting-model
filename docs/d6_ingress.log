@@ -1,0 +1,9 @@
+$ kubectl get ingress
+NAME                   CLASS   HOSTS                ADDRESS        PORTS   AGE
+btc-forecast-ingress   nginx   btc-forecast.local   192.168.49.2   80      33m
+$ curl -H "Host: btc-forecast.local" http://127.0.0.1/health
+{"model_loaded":true,"model_version":"20261115163958","stage":"production","status":"ok","uptime_seconds":1651.7}
+
+$ curl -X POST -H "Host: btc-forecast.local" http://127.0.0.1/predict
+{"forecast_days":7,"model_version":"20261115163958","predictions":[{"date":"2026-11-16","predicted_close":64322.85},{"date":"2026-11-17","predicted_close":64285.15},{"date":"2026-11-18","predicted_close":65489.96},{"date":"2026-11-19","predicted_close":65661.77},{"date":"2026-11-20","predicted_close":66300.83},{"date":"2026-11-21","predicted_close":66102.16},{"date":"2026-11-22","predicted_close":66355.52}]}
+
