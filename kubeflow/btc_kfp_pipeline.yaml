@@ -1,0 +1,216 @@
+# PIPELINE DEFINITION
+# Name: btc-forecast-pipeline
+# Description: BTC-USD ingest, features, training
+# Inputs:
+#    period: str [Default: '5y']
+components:
+  comp-build-features:
+    executorLabel: exec-build-features
+    inputDefinitions:
+      artifacts:
+        raw_data:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+    outputDefinitions:
+      artifacts:
+        features:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+  comp-ingest-data:
+    executorLabel: exec-ingest-data
+    inputDefinitions:
+      parameters:
+        period:
+          defaultValue: 5y
+          isOptional: true
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        raw_data:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+  comp-train-model:
+    executorLabel: exec-train-model
+    inputDefinitions:
+      artifacts:
+        features:
+          artifactType:
+            schemaTitle: system.Dataset
+            schemaVersion: 0.0.1
+    outputDefinitions:
+      artifacts:
+        metrics:
+          artifactType:
+            schemaTitle: system.Metrics
+            schemaVersion: 0.0.1
+        model:
+          artifactType:
+            schemaTitle: system.Model
+            schemaVersion: 0.0.1
+deploymentSpec:
+  executors:
+    exec-build-features:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - build_features
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'pandas' 'numpy'\
+          \ 'scikit-learn' 'joblib' 'yfinance'  &&  python3 -m pip install --quiet\
+          \ --no-warn-script-location 'kfp==2.18.0' '--no-deps' 'typing-extensions>=3.7.4,<5;\
+          \ python_version<\"3.9\"' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef build_features(raw_data: dsl.Input[dsl.Dataset], features: dsl.Output[dsl.Dataset]):\n\
+          \    import numpy as np\n    import pandas as pd\n\n    df = pd.read_csv(raw_data.path,\
+          \ index_col=0, parse_dates=True).sort_index()\n    df[\"ret\"] = np.log(df[\"\
+          Close\"]).diff()\n    df[\"ma7\"] = df[\"Close\"].rolling(7).mean()\n  \
+          \  df[\"ma30\"] = df[\"Close\"].rolling(30).mean()\n    df[\"vol7\"] = df[\"\
+          ret\"].rolling(7).std()\n    df.dropna().to_csv(features.path)\n\n"
+        image: python:3.10-slim
+    exec-ingest-data:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - ingest_data
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'pandas' 'numpy'\
+          \ 'scikit-learn' 'joblib' 'yfinance'  &&  python3 -m pip install --quiet\
+          \ --no-warn-script-location 'kfp==2.18.0' '--no-deps' 'typing-extensions>=3.7.4,<5;\
+          \ python_version<\"3.9\"' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef ingest_data(raw_data: dsl.Output[dsl.Dataset], period: str =\
+          \ \"5y\"):\n    import yfinance as yf\n\n    df = yf.download(\"BTC-USD\"\
+          , period=period, interval=\"1d\", auto_adjust=False, progress=False)\n \
+          \   if hasattr(df.columns, \"get_level_values\"):\n        df.columns =\
+          \ df.columns.get_level_values(0)\n    df[[\"Open\", \"High\", \"Low\", \"\
+          Close\", \"Volume\"]].dropna().to_csv(raw_data.path)\n\n"
+        image: python:3.10-slim
+    exec-train-model:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - train_model
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'pandas' 'numpy'\
+          \ 'scikit-learn' 'joblib' 'yfinance'  &&  python3 -m pip install --quiet\
+          \ --no-warn-script-location 'kfp==2.18.0' '--no-deps' 'typing-extensions>=3.7.4,<5;\
+          \ python_version<\"3.9\"' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef train_model(\n    features: dsl.Input[dsl.Dataset],\n    model:\
+          \ dsl.Output[dsl.Model],\n    metrics: dsl.Output[dsl.Metrics],\n):\n  \
+          \  import joblib\n    import numpy as np\n    import pandas as pd\n    from\
+          \ sklearn.ensemble import GradientBoostingRegressor\n\n    df = pd.read_csv(features.path,\
+          \ index_col=0, parse_dates=True)\n    cols = [\"ma7\", \"ma30\", \"vol7\"\
+          ]\n    X = df[cols].shift(1).dropna()\n    y = df[\"ret\"].loc[X.index]\n\
+          \    X_tr, X_te, y_tr, y_te = X[:-7], X[-7:], y[:-7], y[-7:]\n    m = GradientBoostingRegressor(random_state=42).fit(X_tr,\
+          \ y_tr)\n    p = m.predict(X_te)\n    metrics.log_metric(\"mae_return\"\
+          , float(np.mean(np.abs(p - y_te))))\n    metrics.log_metric(\"rmse_return\"\
+          , float(np.sqrt(np.mean((p - y_te) ** 2))))\n    joblib.dump(m, model.path)\n\
+          \n"
+        image: python:3.10-slim
+pipelineInfo:
+  description: BTC-USD ingest, features, training
+  name: btc-forecast-pipeline
+root:
+  dag:
+    tasks:
+      build-features:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-build-features
+        dependentTasks:
+        - ingest-data
+        inputs:
+          artifacts:
+            raw_data:
+              taskOutputArtifact:
+                outputArtifactKey: raw_data
+                producerTask: ingest-data
+        taskInfo:
+          name: build-features
+      ingest-data:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-ingest-data
+        inputs:
+          parameters:
+            period:
+              componentInputParameter: period
+        taskInfo:
+          name: ingest-data
+      train-model:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-train-model
+        dependentTasks:
+        - build-features
+        inputs:
+          artifacts:
+            features:
+              taskOutputArtifact:
+                outputArtifactKey: features
+                producerTask: build-features
+        taskInfo:
+          name: train-model
+  inputDefinitions:
+    parameters:
+      period:
+        defaultValue: 5y
+        isOptional: true
+        parameterType: STRING
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.18.0
