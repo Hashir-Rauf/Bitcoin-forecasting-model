@@ -1,0 +1,36 @@
+### E1 self-healing
+NAME                           READY   STATUS    RESTARTS        AGE
+btc-forecast-ff4bffb9c-88b5v   1/1     Running   0               41s
+btc-forecast-ff4bffb9c-lcf6q   1/1     Running   0               41s
+btc-forecast-ff4bffb9c-ln5s4   1/1     Running   0               5m50s
+btc-forecast-ff4bffb9c-m5fgx   1/1     Running   0               26s
+btc-forecast-ff4bffb9c-mxzvz   1/1     Running   0               26s
+btc-forecast-ff4bffb9c-v7frd   1/1     Running   0               5m36s
+btc-forecast-ff4bffb9c-x7mdt   1/1     Running   1 (2m20s ago)   5m43s
+btc-forecast-ff4bffb9c-xbkhb   1/1     Running   0               41s
+$ kubectl delete pod/btc-forecast-ff4bffb9c-88b5v
+pod "btc-forecast-ff4bffb9c-88b5v" deleted from default namespace
+NAME                           READY   STATUS        RESTARTS        AGE
+btc-forecast-ff4bffb9c-4r428   0/1     Running       0               3s
+btc-forecast-ff4bffb9c-88b5v   1/1     Terminating   0               44s
+btc-forecast-ff4bffb9c-lcf6q   1/1     Running       0               44s
+btc-forecast-ff4bffb9c-ln5s4   1/1     Running       0               5m53s
+btc-forecast-ff4bffb9c-m5fgx   1/1     Running       0               29s
+btc-forecast-ff4bffb9c-mxzvz   1/1     Running       0               29s
+btc-forecast-ff4bffb9c-v7frd   1/1     Running       0               5m39s
+btc-forecast-ff4bffb9c-x7mdt   1/1     Running       1 (2m23s ago)   5m46s
+btc-forecast-ff4bffb9c-xbkhb   1/1     Running       0               44s
+NAME                           READY   STATUS        RESTARTS        AGE
+btc-forecast-ff4bffb9c-4r428   1/1     Running       0               23s
+btc-forecast-ff4bffb9c-88b5v   1/1     Terminating   0               64s
+btc-forecast-ff4bffb9c-lcf6q   1/1     Running       0               64s
+btc-forecast-ff4bffb9c-ln5s4   1/1     Running       0               6m13s
+btc-forecast-ff4bffb9c-m5fgx   1/1     Running       0               49s
+btc-forecast-ff4bffb9c-mxzvz   1/1     Running       0               49s
+btc-forecast-ff4bffb9c-v7frd   1/1     Running       0               5m59s
+btc-forecast-ff4bffb9c-x7mdt   1/1     Running       1 (2m43s ago)   6m6s
+btc-forecast-ff4bffb9c-xbkhb   1/1     Running       0               64s
+49s         Normal    Scheduled                      pod/btc-forecast-ff4bffb9c-mxzvz           Successfully assigned default/btc-forecast-ff4bffb9c-mxzvz to minikube
+23s         Normal    Killing                        pod/btc-forecast-ff4bffb9c-88b5v           Stopping container api
+23s         Normal    SuccessfulCreate               replicaset/btc-forecast-ff4bffb9c          (combined from similar events): Created pod: btc-forecast-ff4bffb9c-4r428
+23s         Normal    Scheduled                      pod/btc-forecast-ff4bffb9c-4r428           Successfully assigned default/btc-forecast-ff4bffb9c-4r428 to minikube

@@ -1,0 +1,25 @@
+$ kubectl get pods,svc,hpa,ingress,pvc
+NAME                               READY   STATUS        RESTARTS        AGE
+pod/btc-forecast-ff4bffb9c-4r428   1/1     Running       0               23s
+pod/btc-forecast-ff4bffb9c-88b5v   1/1     Terminating   0               64s
+pod/btc-forecast-ff4bffb9c-lcf6q   1/1     Running       0               64s
+pod/btc-forecast-ff4bffb9c-ln5s4   1/1     Running       0               6m13s
+pod/btc-forecast-ff4bffb9c-m5fgx   1/1     Running       0               49s
+pod/btc-forecast-ff4bffb9c-mxzvz   1/1     Running       0               49s
+pod/btc-forecast-ff4bffb9c-v7frd   1/1     Running       0               5m59s
+pod/btc-forecast-ff4bffb9c-x7mdt   1/1     Running       1 (2m43s ago)   6m6s
+pod/btc-forecast-ff4bffb9c-xbkhb   1/1     Running       0               64s
+
+NAME                            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+service/btc-forecast-nodeport   NodePort    10.104.157.15    <none>        80:30080/TCP   6m39s
+service/btc-forecast-svc        ClusterIP   10.107.213.213   <none>        80/TCP         6m39s
+service/kubernetes              ClusterIP   10.96.0.1        <none>        443/TCP        8m38s
+
+NAME                                                   REFERENCE                 TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/btc-forecast-hpa   Deployment/btc-forecast   cpu: 20%/60%   2         8         8          6m39s
+
+NAME                                             CLASS   HOSTS                ADDRESS        PORTS   AGE
+ingress.networking.k8s.io/btc-forecast-ingress   nginx   btc-forecast.local   192.168.49.2   80      6m39s
+
+NAME                                   STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+persistentvolumeclaim/btc-models-pvc   Bound    pvc-0e55cd63-e557-4a85-b487-0ae5e621fc2a   1Gi        RWO            standard       <unset>                 6m39s

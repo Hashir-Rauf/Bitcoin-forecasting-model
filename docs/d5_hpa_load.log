@@ -1,0 +1,34 @@
+### D5 HPA under load (8 parallel clients -> /predict)
+21:40:58
+btc-forecast-hpa   Deployment/btc-forecast   cpu: <unknown>/60%   2     8     3     83s
+21:41:13
+btc-forecast-hpa   Deployment/btc-forecast   cpu: <unknown>/60%   2     8     3     98s
+21:41:28
+btc-forecast-hpa   Deployment/btc-forecast   cpu: 96%/60%   2     8     3     114s
+21:41:44
+btc-forecast-hpa   Deployment/btc-forecast   cpu: 96%/60%   2     8     3     2m9s
+21:41:59
+btc-forecast-hpa   Deployment/btc-forecast   cpu: 96%/60%   2     8     3     2m24s
+21:42:14
+btc-forecast-hpa   Deployment/btc-forecast   cpu: 96%/60%   2     8     3     2m39s
+21:42:29
+btc-forecast-hpa   Deployment/btc-forecast   cpu: 428%/60%   2     8     3     2m54s
+21:42:44
+btc-forecast-hpa   Deployment/btc-forecast   cpu: 450%/60%   2     8     6     3m10s
+21:43:00
+btc-forecast-hpa   Deployment/btc-forecast   cpu: 450%/60%   2     8     8     3m26s
+21:43:16
+btc-forecast-hpa   Deployment/btc-forecast   cpu: 455%/60%   2     8     8     3m41s
+21:43:31
+btc-forecast-hpa   Deployment/btc-forecast   cpu: <unknown>/60%   2     8     8     3m56s
+21:43:46
+btc-forecast-hpa   Deployment/btc-forecast   cpu: <unknown>/60%   2     8     8     4m12s
+NAME                           READY   STATUS    RESTARTS      AGE
+btc-forecast-ff4bffb9c-4qk5c   0/1     Running   1 (28s ago)   102s
+btc-forecast-ff4bffb9c-dt99q   0/1     Running   1 (28s ago)   102s
+btc-forecast-ff4bffb9c-grgrn   0/1     Running   1             102s
+btc-forecast-ff4bffb9c-ln5s4   1/1     Running   0             4m1s
+btc-forecast-ff4bffb9c-nzvn2   1/1     Running   0             87s
+btc-forecast-ff4bffb9c-v7frd   1/1     Running   0             3m47s
+btc-forecast-ff4bffb9c-x4q4d   1/1     Running   0             87s
+btc-forecast-ff4bffb9c-x7mdt   0/1     Running   1 (31s ago)   3m54s
