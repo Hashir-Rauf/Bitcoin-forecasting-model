@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+data/
+models/*
+!models/.gitkeep
+.pytest_cache/
+airflow/logs/
