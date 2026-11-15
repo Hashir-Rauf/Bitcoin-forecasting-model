@@ -9,7 +9,7 @@ x-airflow-common: &airflow-common
     MODEL_DIR: /opt/airflow/shared/models
     API_RELOAD_URL: http://api:5000/reload
     PYTHONPATH: /opt/airflow/project
-    _PIP_ADDITIONAL_REQUIREMENTS: "yfinance scikit-learn pandas numpy joblib"
+    _PIP_ADDITIONAL_REQUIREMENTS: "yfinance scikit-learn==1.7.2"
   volumes:
     - ./dags:/opt/airflow/dags
     - ./src:/opt/airflow/project/src

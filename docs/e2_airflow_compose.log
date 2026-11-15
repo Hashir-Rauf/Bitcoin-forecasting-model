@@ -1,0 +1,15 @@
+$ airflow tasks states-for-dag-run btc_etl_pipeline manual__2026-11-15T16:52:44+00:00
+ task_id               state   
+ fetch_data            success 
+ preprocess_features   success 
+ retrain_evaluate      success 
+ reload_api_model      success 
+
+$ curl localhost:5000/health  (before reload) / POST /predict (after reload)
+{"forecast_days":7,"model_version":"20261115170351","predictions":[{"date":"2026-11-16","predicted_close":64671.43},{"date":"2026-11-17","predicted_close":64956.36},{"date":"2026-11-18","predicted_close":65790.36},{"date":"2026-11-19","predicted_close":66208.11},{"date":"2026-11-20","predicted_close":66675.94},{"date":"2026-11-21","predicted_close":66544.5},{"date":"2026-11-22","predicted_close":66693.34}]}
+
+NAME                       IMAGE                             COMMAND                  SERVICE             CREATED          STATUS                    PORTS
+ass3-airflow-scheduler-1   apache/airflow:2.9.3-python3.10   "/usr/bin/dumb-init …"   airflow-scheduler   15 minutes ago   Up 12 minutes             8080/tcp
+ass3-airflow-webserver-1   apache/airflow:2.9.3-python3.10   "/usr/bin/dumb-init …"   airflow-webserver   15 minutes ago   Up 12 minutes             0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+ass3-api-1                 ass3-api                          "sh -c 'gunicorn --b…"   api                 56 seconds ago   Up 40 seconds (healthy)   0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp
+ass3-postgres-1            postgres:15-alpine                "docker-entrypoint.s…"   postgres            15 minutes ago   Up 15 minutes (healthy)   5432/tcp
