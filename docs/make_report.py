@@ -130,7 +130,7 @@ def build():
     s += [
         Paragraph("Assignment 3 - Production MLOps Pipeline for BTC-USD 7-Day Forecast", H1),
         Paragraph(f"Repository: {REPO}<br/>Docker image: Docker Hub "
-                  "&lt;DOCKER_USERNAME&gt;/btc-forecast (tags: commit SHA, latest)", B),
+                  "hashirrauf/btc-forecast (tags: commit SHA, latest)", B),
         Spacer(1, 6),
         Paragraph("1. Architecture", H2),
         Image(str(arch), width=17 * cm, height=7.1 * cm),
@@ -200,7 +200,7 @@ def build():
                   "btc-forecast.local (hosts-file edit needs admin) and was routed by NGINX to the "
                   "service:", B),
         code(read("d6_ingress.log")),
-        placeholder("Optional: browser/terminal screenshot of the ingress request"),
+        *shot("ingress.png", "Fig. Request routed by NGINX Ingress for host btc-forecast.local", 15),
         PageBreak(),
         Paragraph("8. E1 - Chaos / self-healing", H2),
         Paragraph("A running pod (btc-forecast-ff4bffb9c-88b5v) was deleted. The ReplicaSet created "
