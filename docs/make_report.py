@@ -114,6 +114,16 @@ def placeholder(label):
     return Paragraph(f"[SCREENSHOT TO INSERT: {label}]", PH)
 
 
+def shot(name, caption, width_cm=15.5):
+    from PIL import Image as PILImage
+
+    path = D.parent / "Screenshots" / name
+    w, h = PILImage.open(path).size
+    wd = width_cm * cm
+    return [Image(str(path), width=wd, height=wd * h / w),
+            Paragraph(f"<i>{caption}</i>", B), Spacer(1, 4)]
+
+
 def build():
     arch, hpa = architecture_png(), hpa_png()
     s = []
@@ -147,8 +157,9 @@ def build():
                   "black --check and pytest on every push/PR to main, then logs in to Docker Hub using "
                   "the DOCKER_USERNAME / DOCKER_PASSWORD secrets and pushes the image tagged with the "
                   "commit SHA and latest. The latest run on main: both jobs (test, docker) succeeded.", B),
-        placeholder("GitHub Actions run page (green test + docker jobs)"),
-        placeholder("Docker Hub repository page showing SHA and latest tags"),
+        *shot("GithubActions.png", "Fig. GitHub Actions run: test and docker jobs succeeded", 13),
+        *shot("dockerhub.png", "Fig. Docker Hub hashirrauf/btc-forecast with SHA and latest tags", 13),
+        *shot("Docker build.png", "Fig. docker build output (multi-stage, non-root user)", 11),
         PageBreak(),
         Paragraph("4. Part C - Airflow ETL DAG and Kubeflow", H2),
         Paragraph("DAG btc_etl_pipeline (@daily): fetch_data &gt; preprocess_features &gt; "
@@ -158,7 +169,7 @@ def build():
                   "between the Airflow and API images (numpy/pandas/dill) that made /reload return 500; "
                   "fixed by pinning versions in requirements.txt.", B),
         code(read("e2_airflow_compose.log", 16)),
-        placeholder("Airflow UI graph view of btc_etl_pipeline, all tasks green"),
+        *shot("DAG.png", "Fig. Airflow graph view of btc_etl_pipeline (grid: all task runs green)", 14),
         Paragraph("kubeflow/btc_kfp_pipeline.py defines three KFP components (ingest_data, "
                   "build_features, train_model) wired into btc_pipeline and compiled to "
                   "kubeflow/btc_kfp_pipeline.yaml with the kfp 2.x SDK (compiled successfully; it was "
@@ -181,12 +192,15 @@ def build():
                   "busybox generator.)", B),
         Image(str(hpa), width=14 * cm, height=5.6 * cm),
         code(read("d5_hpa_load.log", 22)),
-        placeholder("kubectl get hpa --watch during load"),
+        *shot("watch.png", "Fig. kubectl get hpa --watch: replicas 2 -> 4 -> 6 -> 8 under load", 14),
+        *shot("kubectl get pods etc.png", "Fig. kubectl get pods,svc,hpa,ingress,pvc", 15),
+        *shot("predict.png", "Fig. Sample 7-day prediction from the API", 16),
         Paragraph("7. D6 - Ingress", H2),
         Paragraph("With minikube tunnel running, the request was sent with the Host header "
                   "btc-forecast.local (hosts-file edit needs admin) and was routed by NGINX to the "
                   "service:", B),
         code(read("d6_ingress.log")),
+        placeholder("Optional: browser/terminal screenshot of the ingress request"),
         PageBreak(),
         Paragraph("8. E1 - Chaos / self-healing", H2),
         Paragraph("A running pod (btc-forecast-ff4bffb9c-88b5v) was deleted. The ReplicaSet created "
@@ -195,6 +209,8 @@ def build():
                   "scaled to 8 by the HPA after the load test, which is why more than 3 pods are listed.)",
                   B),
         code(read("e1_self_healing.log", 40)),
+        *shot("delete pod.png", "Fig. Deleting a running pod", 13),
+        *shot("AFter deleted.png", "Fig. Old pod Terminating, new pod ContainerCreating then Running", 12),
         Paragraph("9. E2 - End-to-end verification", H2),
         Paragraph("(1) Airflow DAG triggered manually: all tasks succeeded and a new model version "
                   "was produced. (2) The API reloaded the model through /reload. (3) GitHub Actions "
